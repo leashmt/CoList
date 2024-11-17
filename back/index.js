@@ -13,13 +13,17 @@ app.use(
 );
 const io = socketIo(server, {
 	cors: {
-		origin: 'http://localhost:3000', // Front-end autorisé
-		methods: ['GET', 'POST'], // Méthodes HTTP autorisées
+		origin: 'http://localhost:3000',
+		methods: ['GET', 'POST'],
 	},
 });
 
 io.on('connection', socket => {
 	console.log('A user connected');
+
+	setTimeout(() => {
+		socket.emit('message', { content: 'Hello from the server!' });
+	}, 1000);
 
 	socket.on('disconnect', () => {
 		console.log('User disconnected');
