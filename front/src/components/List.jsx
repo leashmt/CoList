@@ -10,6 +10,7 @@ const List = () => {
 	const [users, setUsers] = useState([]);
 	const [list, setList] = useState([]);
 	const [newElement, setNewElement] = useState('');
+	console.log(list);
 
 	useEffect(() => {
 		socket.emit('getListData', listName, response => {
@@ -27,26 +28,36 @@ const List = () => {
 		});
 
 		socket.on('updateUsers', users => {
+			console.log('updateUsers reçu:', users);
 			setUsers(users);
+		});
+
+		socket.on('updateContent', data => {
+			console.log('updateContent reçu:', data);
+			setList(data.content);
 		});
 
 		return () => {
 			socket.off('getListData');
 			socket.off('listData');
 			socket.off('updateUsers');
+			socket.off('updateContent');
 		};
 	}, []);
 
 	const handleSubmit = e => {
 		e.preventDefault();
-		socket.emit('add', { content: newElement });
+		socket.emit('add', { content: newElement, listName });
 		setNewElement('');
 	};
 
 	return (
 		<div className="list">
 			<div className="header">
-				<h1>CoList</h1>
+				<a href="/">
+					<h1>CoList</h1>
+				</a>
+
 				<h2>Liste actuelle : {listName}</h2>
 			</div>
 			<div className="main">
@@ -63,11 +74,11 @@ const List = () => {
 				<div className="content">
 					<h2>Contenu de la liste</h2>
 					<ul>
-						{list.map(user => (
-							<li key={user.id}>{user.username}</li>
+						{list.map(point => (
+							<li key={point.id}>{point.content}</li>
 						))}
-						{!list.length && <li>Aucun élément dans la liste</li>}
-						<li>
+						{!list.length && <li key="empty">Aucun élément dans la liste</li>}
+						<li key="new">
 							<form onSubmit={handleSubmit}>
 								<input
 									type="text"
@@ -76,7 +87,7 @@ const List = () => {
 									onChange={e => setNewElement(e.target.value)}
 									required
 								/>
-								<button type="submit">Ajouter</button>
+								<button type="submit">+</button>
 							</form>
 						</li>
 					</ul>

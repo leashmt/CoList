@@ -103,14 +103,36 @@ code {
 		padding: 20px;
 
 		ul {
-			list-style: none;
-			padding: 0;
-			margin: 0;
+			list-style: circle;
+			padding-left: 20px;
 
 			li {
 				margin-bottom: 10px;
 				font-size: 16px;
 				font-weight: bold;
+			}
+		}
+
+		input {
+			padding: 3px 8px;
+			border-radius: 5px;
+			margin-right: 5px;
+			border-bottom: #0069d9 solid 1px;
+			border-radius: 0%;
+		}
+
+		button {
+			padding: 3px 10px;
+			border-radius: 20px;
+			border: none;
+			background-color: #007bff;
+			transition: all 0.3s ease;
+			color: #fff;
+			font-size: 16px;
+			cursor: pointer;
+
+			&:hover {
+				background-color: #0069d9;
 			}
 		}
 	}

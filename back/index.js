@@ -40,7 +40,7 @@ io.on('connection', socket => {
 	});
 
 	socket.on('joinList', ({ listName, username }) => {
-		console.log('joinList reçu:', { listName, username });
+		console.log('joinList reçu :', { listName, username });
 
 		let role = 'user';
 		if (!LISTS[listName]) {
@@ -59,6 +59,16 @@ io.on('connection', socket => {
 		});
 
 		io.to(listName).emit('updateUsers', LISTS[listName]);
+	});
+
+	socket.on('add', ({ content, listName }) => {
+		console.log('add reçu:', { content, listName });
+
+		if (LISTS[listName]) {
+			LISTS[listName].content.push({ by: socket.id, content });
+			socket.to(listName).emit('updateContent', LISTS[listName]);
+		}
+		console.log(LISTS[listName].content);
 	});
 
 	socket.on('disconnect', () => {
