@@ -3,7 +3,6 @@ import { FaPencilAlt } from 'react-icons/fa';
 import { FaDeleteLeft } from 'react-icons/fa6';
 import { IoShareOutline } from 'react-icons/io5';
 import { RiAdminFill } from 'react-icons/ri';
-
 import io from 'socket.io-client';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
@@ -14,6 +13,7 @@ const List = () => {
 	const { listName, username } = useParams();
 	const [users, setUsers] = useState([]);
 	const [list, setList] = useState([]);
+	const [listRequest, setListRequest] = useState([]);
 	const [newElement, setNewElement] = useState('');
 	const [currentUser, setCurrentUser] = useState(null);
 
@@ -22,6 +22,7 @@ const List = () => {
 			if (response.success) {
 				setUsers(response.users);
 				setList(response.content);
+				setListRequest(response.request);
 				setCurrentUser(response.users.find(user => user.username === username));
 			} else if (response.notlist) {
 				navigate('/');
@@ -31,6 +32,7 @@ const List = () => {
 		socket.on('listData', data => {
 			setUsers(data.users);
 			setList(data.content);
+			setListRequest(data.request);
 		});
 
 		socket.on('updateUsers', users => {
@@ -51,11 +53,19 @@ const List = () => {
 
 	const handleSubmit = e => {
 		e.preventDefault();
-		socket.emit('add', {
-			content: newElement,
-			listName,
-			username: currentUser.username,
-		});
+		if (currentUser?.role === 'owner' || currentUser?.role === 'admin') {
+			socket.emit('add', {
+				content: newElement,
+				listName,
+				username: currentUser.username,
+			});
+		} else {
+			socket.emit('requestAdd', {
+				content: newElement,
+				listName,
+				username: currentUser.username,
+			});
+		}
 		setNewElement('');
 	};
 
@@ -144,7 +154,21 @@ const List = () => {
 										)}
 								</div>
 							))}
-						{!list.length && <li key="empty">Aucun élément dans la liste</li>}
+						{list?.length === 0 && (
+							<div key="empty">Aucun élément dans la liste</div>
+						)}
+						{listRequest.length > 0 &&
+							listRequest.map((request, index) =>
+								request.byName === currentUser?.username ? (
+									<div key={index} className="point request">
+										<p>
+											{'>>'} {request.content}
+											<i> par {request.byName} </i>
+											(en attente de validation)
+										</p>
+									</div>
+								) : null
+							)}
 						<div key="new" className="new">
 							<form onSubmit={handleSubmit}>
 								<input

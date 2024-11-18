@@ -29,6 +29,7 @@ io.on('connection', socket => {
 				success: true,
 				users: LISTS[listName].user,
 				content: LISTS[listName].content,
+				request: LISTS[listName].request,
 			});
 		} else {
 			callback({
@@ -58,7 +59,7 @@ io.on('connection', socket => {
 
 		let role = 'user';
 		if (!LISTS[listName]) {
-			LISTS[listName] = { user: [], content: [] };
+			LISTS[listName] = { user: [], content: [], request: [] };
 			role = 'owner';
 		}
 
@@ -84,6 +85,69 @@ io.on('connection', socket => {
 				id: Date.now(),
 			});
 			io.emit('updateContent', LISTS[listName]);
+		}
+	});
+
+	socket.on('requestAdd', ({ content, listName, username }) => {
+		console.log('requestAdd reçu:', { content, listName, username });
+
+		if (LISTS[listName]) {
+			LISTS[listName].request.push({
+				by: socket.id,
+				content,
+				byName: username,
+				id: Date.now(),
+			});
+			io.emit('updateRequest', LISTS[listName].request);
+			io.emit('listData', {
+				content: LISTS[listName].content,
+				users: LISTS[listName].user,
+				request: LISTS[listName].request,
+			});
+		}
+	});
+
+	socket.on('validateRequest', ({ id, listName }) => {
+		const list = LISTS[listName];
+
+		if (list) {
+			const request = list.request.find(p => p.id === id);
+			if (request) {
+				list.content.push({
+					by: socket.id,
+					content: request.content,
+					byName: request.byName,
+					id: Date.now(),
+				});
+				list.request = list.request.filter(p => p.id !== id);
+				console.log(`Point ajouté: ${request.id}`);
+
+				io.emit('listData', {
+					content: list.content,
+					users: list.user,
+					request: list.request,
+				});
+				io.emit('updateRequest', list.request);
+			}
+		}
+	});
+
+	socket.on('deleteRequest', ({ id, listName }) => {
+		const list = LISTS[listName];
+
+		if (list) {
+			const request = list.request.find(p => p.id === id);
+			if (request) {
+				list.request = list.request.filter(p => p.id !== id);
+				console.log(`Point supprimé: ${request.id}`);
+
+				io.emit('updateRequest', list.request);
+				io.emit('listData', {
+					content: list.content,
+					users: list.user,
+					request: list.request,
+				});
+			}
 		}
 	});
 

@@ -190,6 +190,10 @@ code {
 		.point {
 			display: flex;
 
+			&.request {
+				color: rgb(188, 186, 186);
+			}
+
 			i {
 				margin-left: 4px;
 			}
@@ -229,4 +233,74 @@ code {
 			}
 		}
 	}
-}	
+}
+
+.admin {
+	.header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 10px 20px;
+		background-color: #007bff;
+		color: #fff;
+
+		h1 {
+			font-size: 36px;
+			font-weight: bold;
+		}
+
+		h2 {
+			font-size: 24px;
+		}
+
+		.share-button {
+			font-size: 24px;
+		}
+	}
+
+	.moderation {
+		width: 100%;
+		padding: 20px;
+		min-height: 90vh;
+		background-color: #f8f9fa;
+		
+		h2 {
+			margin-bottom: 10px;
+			font-size: 24px;
+			font-weight: bold;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-bottom: 20px;
+
+			th {
+				text-align: center;
+				padding: 10px;
+				background-color: #007bff;
+				color: #fff;
+			}
+
+			td {
+				padding: 10px;
+				text-align: center;
+				border-bottom: 1px solid #ddd;
+			}
+
+			.actions {
+				font-size: larger;
+
+				button:first-child {
+					margin-right: 10px;
+				}
+			}
+
+			tr:last-child {
+				td {
+					border-bottom: none;
+				}
+			}
+		}
+	}
+}
