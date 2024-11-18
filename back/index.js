@@ -21,8 +21,6 @@ const io = socketIo(server, {
 });
 
 io.on('connection', socket => {
-	// console.log('A user connected');
-
 	socket.on('getListData', (listName, callback) => {
 		if (LISTS[listName]) {
 			callback({
@@ -52,9 +50,6 @@ io.on('connection', socket => {
 	});
 
 	socket.on('joinList', ({ listName, username }) => {
-		console.log('joinList reçu :', { listName, username });
-		// listName = "list"
-
 		socket.join(listName);
 
 		let role = 'user';
@@ -72,6 +67,8 @@ io.on('connection', socket => {
 			content: LISTS[listName].content,
 			users: LISTS[listName].user,
 		});
+
+		io.emit('updateRole', LISTS[listName].user);
 	});
 
 	socket.on('add', ({ content, listName, username }) => {
@@ -163,6 +160,7 @@ io.on('connection', socket => {
 				io.emit('updateContent', {
 					content: list.content,
 					users: list.user,
+					request: list.request,
 				});
 			}
 		}
@@ -183,6 +181,17 @@ io.on('connection', socket => {
 				});
 			}
 		}
+	});
+
+	socket.on('changeRole', ({ id, role, listName }) => {
+		const listUsers = LISTS[listName].user;
+		const userIndex = listUsers.findIndex(user => user.id === id);
+		listUsers[userIndex].role = role;
+
+		io.emit('updateRole', listUsers);
+		io.emit('listData', {
+			users: listUsers,
+		});
 	});
 
 	socket.on('disconnect', () => {

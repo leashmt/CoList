@@ -30,9 +30,16 @@ const List = () => {
 		});
 
 		socket.on('listData', data => {
-			setUsers(data.users);
-			setList(data.content);
-			setListRequest(data.request);
+			if (data.users) {
+				setCurrentUser(data.users.find(user => user.username === username));
+				setUsers(data.users);
+			}
+			if (data.content) {
+				setList(data.content);
+			}
+			if (data.request) {
+				setListRequest(data.request);
+			}
 		});
 
 		socket.on('updateUsers', users => {
@@ -104,15 +111,14 @@ const List = () => {
 								</li>
 							))}
 					</ul>
-					{currentUser?.role === 'admin' ||
-						(currentUser?.role === 'owner' && (
-							<Link
-								to={`/admin/${listName}/${username}`}
-								className="admin-link"
-							>
-								<RiAdminFill /> Admin
-							</Link>
-						))}
+					{(currentUser?.role === 'admin' || currentUser?.role === 'owner') && (
+						<Link
+							to={`/admin/${listName}/${username}`}
+							className="admin-link"
+						>
+							<RiAdminFill /> Admin
+						</Link>
+					)}
 				</div>
 				<div className="content">
 					<h2>Contenu de la liste</h2>
@@ -124,6 +130,7 @@ const List = () => {
 									<i> par {point.byName}</i>
 									{currentUser &&
 										(currentUser?.role === 'owner' ||
+											currentUser?.role === 'admin' ||
 											currentUser.username === point.byName) && (
 											<div className="buttons-update">
 												<button
