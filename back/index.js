@@ -21,7 +21,7 @@ const io = socketIo(server, {
 });
 
 io.on('connection', socket => {
-	console.log('A user connected');
+	// console.log('A user connected');
 
 	socket.on('getListData', (listName, callback) => {
 		if (LISTS[listName]) {
@@ -51,9 +51,10 @@ io.on('connection', socket => {
 	});
 
 	socket.on('joinList', ({ listName, username }) => {
-		socket.join(listName);
-
 		console.log('joinList reçu :', { listName, username });
+		// listName = "list"
+
+		socket.join(listName);
 
 		let role = 'user';
 		if (!LISTS[listName]) {

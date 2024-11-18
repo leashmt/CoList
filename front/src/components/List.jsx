@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaPencilAlt } from 'react-icons/fa';
 import { FaDeleteLeft } from 'react-icons/fa6';
+import { IoShareOutline } from 'react-icons/io5';
 import io from 'socket.io-client';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -64,6 +65,11 @@ const List = () => {
 		socket.emit('edit', { pointId, newContent, listName });
 	};
 
+	const handleShare = () => {
+		navigator.clipboard.writeText(`localhost:3000/${listName}`);
+		alert('Lien copié dans le presse-papier');
+	};
+
 	return (
 		<div className="list">
 			<div className="header">
@@ -71,6 +77,9 @@ const List = () => {
 					<h1>CoList</h1>
 				</a>
 				<h2>Liste actuelle : {listName}</h2>
+				<button className="share-button" onClick={handleShare}>
+					<IoShareOutline />
+				</button>
 			</div>
 			<div className="main">
 				<div className="aside">

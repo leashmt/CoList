@@ -3,6 +3,7 @@ import io from 'socket.io-client';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './components/Home';
 import List from './components/List';
+import Connexion from './components/Connexion';
 
 const socket = io('http://localhost:3001');
 
@@ -28,6 +29,7 @@ function App() {
 			<Routes>
 				<Route path="/" element={<Home />} />
 				<Route path="/:listName/:username" element={<List />} />
+				<Route path="/:listName" element={<Connexion />} />
 			</Routes>
 		</Router>
 	);

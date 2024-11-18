@@ -62,6 +62,54 @@ code {
 	}
 }
 
+.connexion {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	background-color: #f8f9fa;
+
+	.error {
+		margin-top: 10px;
+		color: red;
+	}
+
+	h1 {
+		margin-bottom: 20px;
+		font-size: 36px;
+	}
+
+	form {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+
+		input {
+			padding: 10px;
+			border-radius: 5px;
+			border: 1px solid #ccc;
+			font-size: 16px;
+		}
+
+		button {
+			padding: 10px 20px;
+			border-radius: 5px;
+			border: none;
+			background-color: #007bff;
+			transition: all 0.3s ease;
+			color: #fff;
+			font-size: 16px;
+			cursor: pointer;
+
+			&:hover {
+				background-color: #0069d9;
+			}
+		}
+	}
+}
+
 .list {
 	min-height: 100vh;
 
@@ -79,6 +127,10 @@ code {
 		}
 
 		h2 {
+			font-size: 24px;
+		}
+
+		.share-button {
 			font-size: 24px;
 		}
 	}
