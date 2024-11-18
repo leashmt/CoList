@@ -54,6 +54,8 @@ const Admin = () => {
 
 		return () => {
 			socket.off('getListData');
+			socket.off('updateRequest');
+			socket.off('updateRole');
 		};
 	}, []);
 
