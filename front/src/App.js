@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './components/Home';
 import List from './components/List';
 import Connexion from './components/Connexion';
+import Admin from './components/Admin';
 
 const socket = io('http://localhost:3001');
 
@@ -30,6 +31,7 @@ function App() {
 				<Route path="/" element={<Home />} />
 				<Route path="/:listName/:username" element={<List />} />
 				<Route path="/:listName" element={<Connexion />} />
+				<Route path="/admin/:listName/:username" element={<Admin />} />
 			</Routes>
 		</Router>
 	);

@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { FaPencilAlt } from 'react-icons/fa';
 import { FaDeleteLeft } from 'react-icons/fa6';
 import { IoShareOutline } from 'react-icons/io5';
+import { RiAdminFill } from 'react-icons/ri';
+
 import io from 'socket.io-client';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 const socket = io('http://localhost:3001');
 
@@ -92,6 +94,15 @@ const List = () => {
 								</li>
 							))}
 					</ul>
+					{currentUser?.role === 'admin' ||
+						(currentUser?.role === 'owner' && (
+							<Link
+								to={`/admin/${listName}/${username}`}
+								className="admin-link"
+							>
+								<RiAdminFill /> Admin
+							</Link>
+						))}
 				</div>
 				<div className="content">
 					<h2>Contenu de la liste</h2>
