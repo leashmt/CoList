@@ -5,6 +5,8 @@ const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
+const LISTS = {};
+
 app.use(
 	cors({
 		origin: 'http://localhost:3000',
@@ -21,9 +23,43 @@ const io = socketIo(server, {
 io.on('connection', socket => {
 	console.log('A user connected');
 
-	setTimeout(() => {
-		socket.emit('message', { content: 'Hello from the server!' });
-	}, 1000);
+	socket.on('getListData', (listName, callback) => {
+		if (LISTS[listName]) {
+			callback({
+				success: true,
+				users: LISTS[listName].user,
+				content: LISTS[listName].content,
+			});
+		} else {
+			callback({
+				success: false,
+				notlist: true,
+				message: "La liste n'existe pas",
+			});
+		}
+	});
+
+	socket.on('joinList', ({ listName, username }) => {
+		console.log('joinList reçu:', { listName, username });
+
+		let role = 'user';
+		if (!LISTS[listName]) {
+			LISTS[listName] = { user: [], content: [] };
+			role = 'owner';
+		}
+		LISTS[listName].user.push({ id: socket.id, username, role });
+		socket.join(listName);
+
+		console.log(`${username} to ${listName}`);
+		console.log(LISTS);
+
+		socket.emit('listData', {
+			users: LISTS[listName].user,
+			content: LISTS[listName].content,
+		});
+
+		io.to(listName).emit('updateUsers', LISTS[listName]);
+	});
 
 	socket.on('disconnect', () => {
 		console.log('User disconnected');

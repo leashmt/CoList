@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import io from 'socket.io-client';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './components/Home';
+import List from './components/List';
+
 const socket = io('http://localhost:3001');
 
 function App() {
-	const [message, setMessage] = useState('');
-
 	useEffect(() => {
 		socket.on('connect', () => {
 			console.log('Connected to server');
@@ -12,11 +14,6 @@ function App() {
 
 		socket.on('disconnect', () => {
 			console.log('Disconnected from server');
-		});
-
-		socket.on('message', data => {
-			console.log('Message received:', data);
-			setMessage(data.content);
 		});
 
 		return () => {
@@ -27,10 +24,12 @@ function App() {
 	}, []);
 
 	return (
-		<div>
-			<h1>Socket.io Client</h1>
-			<p>Message from server: {message}</p>
-		</div>
+		<Router>
+			<Routes>
+				<Route path="/" element={<Home />} />
+				<Route path="/:listName" element={<List />} />
+			</Routes>
+		</Router>
 	);
 }
 
