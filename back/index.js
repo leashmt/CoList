@@ -41,7 +41,6 @@ io.on('connection', socket => {
 
 	socket.on('checkUserExists', ({ listName, username }, callback) => {
 		const list = LISTS[listName];
-		console.log(list);
 
 		if (list) {
 			const userExists = list.user.some(user => user.username === username);
@@ -52,9 +51,6 @@ io.on('connection', socket => {
 	});
 
 	socket.on('joinList', ({ listName, username }) => {
-		console.log('----');
-		console.log(socket.rooms);
-
 		socket.join(listName);
 
 		console.log('joinList reçu :', { listName, username });
@@ -69,7 +65,6 @@ io.on('connection', socket => {
 		}
 		LISTS[listName].user.push({ id: socket.id, username, role });
 		console.log(`${username} to ${listName}`);
-		console.log(LISTS);
 
 		io.emit('updateContent', {
 			content: LISTS[listName].content,
@@ -81,10 +76,48 @@ io.on('connection', socket => {
 		console.log('add reçu:', { content, listName });
 
 		if (LISTS[listName]) {
-			LISTS[listName].content.push({ by: socket.id, content, byName: username });
+			LISTS[listName].content.push({
+				by: socket.id,
+				content,
+				byName: username,
+				id: Date.now(),
+			});
 			io.emit('updateContent', LISTS[listName]);
 		}
-		console.log(LISTS[listName].content);
+	});
+
+	socket.on('delete', ({ pointId, listName }) => {
+		const list = LISTS[listName];
+
+		if (list) {
+			const point = list.content.find(p => p.id === pointId);
+			if (point) {
+				list.content = list.content.filter(p => p.id !== pointId);
+				console.log(`Point supprimé: ${pointId}`);
+
+				io.emit('updateContent', {
+					content: list.content,
+					users: list.user,
+				});
+			}
+		}
+	});
+
+	socket.on('edit', ({ pointId, newContent, listName }) => {
+		const list = LISTS[listName];
+
+		if (list) {
+			const point = list.content.find(p => p.id === pointId);
+			if (point) {
+				point.content = newContent;
+				console.log(`Point modifié: ${pointId}`);
+
+				io.emit('updateContent', {
+					content: list.content,
+					users: list.user,
+				});
+			}
+		}
 	});
 
 	socket.on('disconnect', () => {

@@ -31,12 +31,10 @@ const List = () => {
 		});
 
 		socket.on('updateUsers', users => {
-			console.log('updateUsers reçu:', users);
 			setUsers(users);
 		});
 
 		socket.on('updateContent', data => {
-			console.log('updateContent reçu:', data);
 			setList(data.content);
 		});
 
@@ -50,7 +48,6 @@ const List = () => {
 
 	const handleSubmit = e => {
 		e.preventDefault();
-		console.log('username', currentUser);
 		socket.emit('add', {
 			content: newElement,
 			listName,
@@ -60,25 +57,11 @@ const List = () => {
 	};
 
 	const handleDelete = pointId => {
-		if (
-			currentUser &&
-			(currentUser.role === 'owner' || currentUser.id === pointId.creatorId)
-		) {
-			socket.emit('delete', { pointId, listName });
-		} else {
-			console.log('Vous ne pouvez pas supprimer ce point');
-		}
+		socket.emit('delete', { pointId, listName });
 	};
 
 	const handleEdit = (pointId, newContent) => {
-		if (
-			currentUser &&
-			(currentUser.role === 'owner' || currentUser.id === pointId.creatorId)
-		) {
-			socket.emit('edit', { pointId, newContent, listName });
-		} else {
-			console.log('Vous ne pouvez pas modifier ce point');
-		}
+		socket.emit('edit', { pointId, newContent, listName });
 	};
 
 	return (
@@ -105,49 +88,42 @@ const List = () => {
 					<h2>Contenu de la liste</h2>
 					<div>
 						{list &&
-							list.map((point, index) => {
-								console.log(point.content, point.byName, currentUser);
-								return (
-									<div key={index} className="point">
-										{'>>'} {point.content}
-										<i> par {point.byName}</i>
-										{currentUser &&
-											(currentUser?.role === 'owner' ||
-												currentUser.username ===
-													point.byName) && (
-												<div className="buttons-update">
-													<button
-														onClick={() => {
-															const newContent = prompt(
-																'Nouveau contenu:',
-																point.content
+							list.map((point, index) => (
+								<div key={index} className="point">
+									{'>>'} {point.content}
+									<i> par {point.byName}</i>
+									{currentUser &&
+										(currentUser?.role === 'owner' ||
+											currentUser.username === point.byName) && (
+											<div className="buttons-update">
+												<button
+													onClick={() => {
+														const newContent = prompt(
+															'Nouveau contenu:',
+															point.content
+														);
+														if (
+															newContent &&
+															newContent !== point.content
+														) {
+															handleEdit(
+																point.id,
+																newContent
 															);
-															if (
-																newContent &&
-																newContent !==
-																	point.content
-															) {
-																handleEdit(
-																	point.index,
-																	newContent
-																);
-															}
-														}}
-													>
-														<FaPencilAlt />
-													</button>
-													<button
-														onClick={() =>
-															handleDelete(point.id)
 														}
-													>
-														<FaDeleteLeft />
-													</button>
-												</div>
-											)}
-									</div>
-								);
-							})}
+													}}
+												>
+													<FaPencilAlt />
+												</button>
+												<button
+													onClick={() => handleDelete(point.id)}
+												>
+													<FaDeleteLeft />
+												</button>
+											</div>
+										)}
+								</div>
+							))}
 						{!list.length && <li key="empty">Aucun élément dans la liste</li>}
 						<div key="new" className="new">
 							<form onSubmit={handleSubmit}>
