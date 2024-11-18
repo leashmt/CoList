@@ -64,19 +64,19 @@ const List = () => {
 				<div className="aside">
 					<h2>Membres</h2>
 					<ul>
-						{users.map(user => (
-							<li key={user.id}>
-								{user.username} - <i>{user.role}</i>
-							</li>
-						))}
+						{users &&
+							users.map(user => (
+								<li key={user.id}>
+									{user.username} - <i>{user.role}</i>
+								</li>
+							))}
 					</ul>
 				</div>
 				<div className="content">
 					<h2>Contenu de la liste</h2>
 					<ul>
-						{list.map(point => (
-							<li key={point.id}>{point.content}</li>
-						))}
+						{list &&
+							list.map(point => <li key={point.id}>{point.content}</li>)}
 						{!list.length && <li key="empty">Aucun élément dans la liste</li>}
 						<li key="new">
 							<form onSubmit={handleSubmit}>

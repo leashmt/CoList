@@ -40,6 +40,11 @@ io.on('connection', socket => {
 	});
 
 	socket.on('joinList', ({ listName, username }) => {
+		console.log('----');
+		console.log(socket.rooms);
+
+		socket.join(listName);
+
 		console.log('joinList reçu :', { listName, username });
 
 		let role = 'user';
@@ -47,18 +52,16 @@ io.on('connection', socket => {
 			LISTS[listName] = { user: [], content: [] };
 			role = 'owner';
 		}
+
 		LISTS[listName].user.push({ id: socket.id, username, role });
-		socket.join(listName);
 
 		console.log(`${username} to ${listName}`);
 		console.log(LISTS);
 
-		socket.emit('listData', {
-			users: LISTS[listName].user,
+		io.emit('updateContent', {
 			content: LISTS[listName].content,
+			users: LISTS[listName].user,
 		});
-
-		io.to(listName).emit('updateUsers', LISTS[listName]);
 	});
 
 	socket.on('add', ({ content, listName }) => {
@@ -66,7 +69,7 @@ io.on('connection', socket => {
 
 		if (LISTS[listName]) {
 			LISTS[listName].content.push({ by: socket.id, content });
-			socket.to(listName).emit('updateContent', LISTS[listName]);
+			io.emit('updateContent', LISTS[listName]);
 		}
 		console.log(LISTS[listName].content);
 	});
