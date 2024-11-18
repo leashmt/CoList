@@ -21,6 +21,10 @@ code {
 	justify-content: center;
 	height: 100vh;
 
+	.error {
+		color: red;
+	}
+
 	h1 {
 		margin-bottom: 20px;
 		font-size: 36px;
@@ -102,17 +106,6 @@ code {
 		width: 80%;
 		padding: 20px;
 
-		ul {
-			list-style: circle;
-			padding-left: 20px;
-
-			li {
-				margin-bottom: 10px;
-				font-size: 16px;
-				font-weight: bold;
-			}
-		}
-
 		input {
 			padding: 3px 8px;
 			border-radius: 5px;
@@ -121,7 +114,34 @@ code {
 			border-radius: 0%;
 		}
 
-		button {
+		.point {
+			display: flex;
+
+			i {
+				margin-left: 4px;
+			}
+		}
+
+		.new {
+			margin-top: 15px;
+		}
+
+		.buttons-update{
+			margin-left: 30px;
+			button {
+				color: #007bff;
+				transition: all 0.3s ease;
+				cursor: pointer;
+				font-size: 16px;
+				padding: 5px;
+
+				&:hover {
+					color: #0069d9;
+				}
+			}
+		}
+
+		.button-submit {
 			padding: 3px 10px;
 			border-radius: 20px;
 			border: none;
@@ -130,7 +150,7 @@ code {
 			color: #fff;
 			font-size: 16px;
 			cursor: pointer;
-
+		
 			&:hover {
 				background-color: #0069d9;
 			}

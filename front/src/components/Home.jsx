@@ -11,14 +11,24 @@ const format = name => {
 const Home = () => {
 	const [username, setUsername] = useState('');
 	const [listName, setListName] = useState('');
+	const [error, setError] = useState('');
 	const navigate = useNavigate();
 
 	const handleSubmit = e => {
 		e.preventDefault();
+
 		if (username && listName) {
-			console.log(format(listName), username);
-			socket.emit('joinList', { listName, username });
-			navigate(`/${format(listName)}`, { state: { username } });
+			console.log('checkUserExists');
+			socket.emit('checkUserExists', { listName, username }, response => {
+				if (response.exists) {
+					setError("Ce nom d'utilisateur est déjà pris dans cette liste.");
+				} else {
+					setError('');
+					console.log('emit');
+					socket.emit('joinList', { listName, username });
+					navigate(`/${format(listName)}/${username}`);
+				}
+			});
 		}
 	};
 
@@ -40,6 +50,7 @@ const Home = () => {
 					onChange={e => setListName(e.target.value)}
 					required
 				/>
+				{error && <p className="error">{error}</p>}
 				<button type="submit">Accéder à la liste</button>
 			</form>
 		</div>

@@ -27,7 +27,7 @@ function App() {
 		<Router>
 			<Routes>
 				<Route path="/" element={<Home />} />
-				<Route path="/:listName" element={<List />} />
+				<Route path="/:listName/:username" element={<List />} />
 			</Routes>
 		</Router>
 	);

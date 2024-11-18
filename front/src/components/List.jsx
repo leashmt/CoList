@@ -1,22 +1,25 @@
 import React, { useEffect, useState } from 'react';
+import { FaPencilAlt } from 'react-icons/fa';
+import { FaDeleteLeft } from 'react-icons/fa6';
 import io from 'socket.io-client';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const socket = io('http://localhost:3001');
 
 const List = () => {
 	const navigate = useNavigate();
-	const { listName } = useParams();
+	const { listName, username } = useParams();
 	const [users, setUsers] = useState([]);
 	const [list, setList] = useState([]);
 	const [newElement, setNewElement] = useState('');
-	console.log(list);
+	const [currentUser, setCurrentUser] = useState(null);
 
 	useEffect(() => {
 		socket.emit('getListData', listName, response => {
 			if (response.success) {
 				setUsers(response.users);
 				setList(response.content);
+				setCurrentUser(response.users.find(user => user.username === username));
 			} else if (response.notlist) {
 				navigate('/');
 			}
@@ -47,8 +50,35 @@ const List = () => {
 
 	const handleSubmit = e => {
 		e.preventDefault();
-		socket.emit('add', { content: newElement, listName });
+		console.log('username', currentUser);
+		socket.emit('add', {
+			content: newElement,
+			listName,
+			username: currentUser.username,
+		});
 		setNewElement('');
+	};
+
+	const handleDelete = pointId => {
+		if (
+			currentUser &&
+			(currentUser.role === 'owner' || currentUser.id === pointId.creatorId)
+		) {
+			socket.emit('delete', { pointId, listName });
+		} else {
+			console.log('Vous ne pouvez pas supprimer ce point');
+		}
+	};
+
+	const handleEdit = (pointId, newContent) => {
+		if (
+			currentUser &&
+			(currentUser.role === 'owner' || currentUser.id === pointId.creatorId)
+		) {
+			socket.emit('edit', { pointId, newContent, listName });
+		} else {
+			console.log('Vous ne pouvez pas modifier ce point');
+		}
 	};
 
 	return (
@@ -57,7 +87,6 @@ const List = () => {
 				<a href="/">
 					<h1>CoList</h1>
 				</a>
-
 				<h2>Liste actuelle : {listName}</h2>
 			</div>
 			<div className="main">
@@ -74,11 +103,53 @@ const List = () => {
 				</div>
 				<div className="content">
 					<h2>Contenu de la liste</h2>
-					<ul>
+					<div>
 						{list &&
-							list.map(point => <li key={point.id}>{point.content}</li>)}
+							list.map((point, index) => {
+								console.log(point.content, point.byName, currentUser);
+								return (
+									<div key={index} className="point">
+										{'>>'} {point.content}
+										<i> par {point.byName}</i>
+										{currentUser &&
+											(currentUser?.role === 'owner' ||
+												currentUser.username ===
+													point.byName) && (
+												<div className="buttons-update">
+													<button
+														onClick={() => {
+															const newContent = prompt(
+																'Nouveau contenu:',
+																point.content
+															);
+															if (
+																newContent &&
+																newContent !==
+																	point.content
+															) {
+																handleEdit(
+																	point.index,
+																	newContent
+																);
+															}
+														}}
+													>
+														<FaPencilAlt />
+													</button>
+													<button
+														onClick={() =>
+															handleDelete(point.id)
+														}
+													>
+														<FaDeleteLeft />
+													</button>
+												</div>
+											)}
+									</div>
+								);
+							})}
 						{!list.length && <li key="empty">Aucun élément dans la liste</li>}
-						<li key="new">
+						<div key="new" className="new">
 							<form onSubmit={handleSubmit}>
 								<input
 									type="text"
@@ -87,10 +158,12 @@ const List = () => {
 									onChange={e => setNewElement(e.target.value)}
 									required
 								/>
-								<button type="submit">+</button>
+								<button className="button-submit" type="submit">
+									+
+								</button>
 							</form>
-						</li>
-					</ul>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -39,6 +39,18 @@ io.on('connection', socket => {
 		}
 	});
 
+	socket.on('checkUserExists', ({ listName, username }, callback) => {
+		const list = LISTS[listName];
+		console.log(list);
+
+		if (list) {
+			const userExists = list.user.some(user => user.username === username);
+			callback({ exists: userExists });
+		} else {
+			callback({ exists: false });
+		}
+	});
+
 	socket.on('joinList', ({ listName, username }) => {
 		console.log('----');
 		console.log(socket.rooms);
@@ -53,8 +65,9 @@ io.on('connection', socket => {
 			role = 'owner';
 		}
 
+		if (LISTS[listName].user.find(user => user.username === username)) {
+		}
 		LISTS[listName].user.push({ id: socket.id, username, role });
-
 		console.log(`${username} to ${listName}`);
 		console.log(LISTS);
 
@@ -64,11 +77,11 @@ io.on('connection', socket => {
 		});
 	});
 
-	socket.on('add', ({ content, listName }) => {
+	socket.on('add', ({ content, listName, username }) => {
 		console.log('add reçu:', { content, listName });
 
 		if (LISTS[listName]) {
-			LISTS[listName].content.push({ by: socket.id, content });
+			LISTS[listName].content.push({ by: socket.id, content, byName: username });
 			io.emit('updateContent', LISTS[listName]);
 		}
 		console.log(LISTS[listName].content);
